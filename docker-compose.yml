@@ -1,0 +1,35 @@
+services:
+  db:
+    image: postgis/postgis:15-3.4
+    container_name: goodsroute_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: goodsroute
+    ports:
+      - "5432:5432"
+    volumes:
+      - goodsroute_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d goodsroute"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  api:
+    build: .
+    container_name: goodsroute_api
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    command: >
+      uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+volumes:
+  goodsroute_postgres_data:
