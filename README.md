@@ -1,15 +1,27 @@
-# GoodsRoute Backend
+# GoodsRoute
 
-A FastAPI backend application for GoodsRoute with PostGIS spatial database support.
+"Google Maps for products": search for an item and find the nearby stores that stock it, compared by price and distance. This repository is the backend.
 
-## Features
+> **Status: in development.** What's here today is the API below: stores, listings and PostGIS radius search. Photo search, JWT authentication and the consumer app are next on the roadmap.
 
-- FastAPI REST API
-- PostGIS for geospatial queries
-- JWT authentication
-- Store management
-- Product listings
-- Geospatial search capabilities
+![How the two-sided platform works](docs_platform.svg)
+
+## API
+
+| Method | Path | What it does |
+|---|---|---|
+| GET | `/health` | Health check |
+| GET, POST | `/stores/` | List or create stores (each with a geographic location) |
+| GET | `/stores/{store_id}` | One store |
+| GET, POST | `/listings/` | List or create product listings |
+| GET, PATCH, DELETE | `/listings/{listing_id}` | Read, update or remove a listing |
+| GET | `/listings/nearby` | Listings from stores within `radius_m` of a point |
+| GET | `/listings/nearby/store/{store_id}` | Listings near a given store |
+| GET | `/search/` | Nearby search. It casts store locations to `geography` and filters with `ST_DWithin` (default radius 3 km, max 100 km) |
+
+## Stack
+
+FastAPI · SQLAlchemy 2 · GeoAlchemy2 · PostgreSQL + PostGIS · Alembic migrations · Docker Compose
 
 ## Prerequisites
 
@@ -94,6 +106,3 @@ alembic upgrade head
 
 See `.env.example` for all available configuration options.
 
-## License
-
-MIT
